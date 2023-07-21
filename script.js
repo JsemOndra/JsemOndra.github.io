@@ -99,7 +99,7 @@ function isValidGPSCoordinate(coordinate) {
 }
 
 function isValidAzimuth(azimuth) {
-  // Regulární výraz pro kontrolu platného azimuthu
+ 
   const azimuthRegex = /^(?:[0-9]|[1-9][0-9]|[1-2][0-9]{2}|3[0-5][0-9]|360)$/;
   return azimuthRegex.test(azimuth);
 }
@@ -252,11 +252,11 @@ function getGPSLocation() {
         document.getElementById("coorInput").value = " " + latitude + " " + longitude;
       },
       function(error) {
-        console.error("Chyba při získávání GPS souřadnic:", error);
+        console.error("Cannot get GPS coordinated:", error);
       }
     );
   } else {
-    console.error("Geolokace není podporována v tomto prohlížeči.");
+    console.error("Geolocation is not supported.");
   }
 }
 
@@ -275,6 +275,6 @@ function getDeviceOrientation() {
       console.log("Azimut:", alpha);
     });
   } else {
-    console.error("Získání azimutu není podporováno v tomto prohlížeči.");
+    console.error("Azimuth not supported by this browser.");
   }
 }
