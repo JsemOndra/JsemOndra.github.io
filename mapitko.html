@@ -49,7 +49,16 @@
 </div>
       <ol id="coorList"></ol>
    
-  </div></div>
+  </div>
+</div>
+<div><button id="jsonButton">Show/hide export</button>
+  <div id="jsonContainer" style="display: none;">
+    <p>Copy and save the JSON below to save your points. You can import it later using the button below</p>
+    <textarea id="jsonTextArea" cols="40" rows="10" placeholder="Vložte JSON zde"></textarea>
+    <br>
+    <button id="setJsonButton">Import Points</button>
+  </div>
+</div>
 
   <script src="script.js?ver=330"></script>
   <script type="text/javascript">
@@ -80,6 +89,36 @@ document.addEventListener('DOMContentLoaded', () => {
   toggleButton.addEventListener('click', () => {
     controlContainer.classList.toggle('collapsed');
     toggleButton.textContent = controlContainer.classList.contains('collapsed') ? 'Expand controls' : 'Collapse controls';
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const jsonButton = document.getElementById('jsonButton');
+  const jsonContainer = document.getElementById('jsonContainer');
+  const jsonTextArea = document.getElementById('jsonTextArea');
+  const setJsonButton = document.getElementById('setJsonButton');
+
+  jsonButton.addEventListener('click', () => {
+    if ( jsonContainer.style.display === 'block') {
+      jsonContainer.style.display = 'none';
+      jsonTextArea.value = '';
+    }else{
+      jsonContainer.style.display = 'block';
+      jsonTextArea.value = JSON.stringify(gpsCoordinates);
+    }
+  });
+
+  setJsonButton.addEventListener('click', () => {
+    try {
+      const jsonString = jsonTextArea.value;
+      const jsonObject = JSON.parse(jsonString);
+      window.gpsCoordinates=jsonObject;
+      console.log('Import:', jsonObject);
+      refreshCoorList();
+      redrawAllLines();
+    } catch (error) {
+      console.error('Import fail:', error);
+    }
   });
 });
 </script>
