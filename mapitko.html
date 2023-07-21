@@ -3,6 +3,8 @@
 <head>
      <meta charset="utf-8" />
     <script type="text/javascript" src="https://api.mapy.cz/loader.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <script type="text/javascript">Loader.load();</script>
     <title>Mapítko</title>
 
@@ -31,21 +33,22 @@
 <div>
    
 
-      
+      <form>
           <label for="coorInput" style="display: inline-block;  width: 180px;" >Your Coordinates</label>
-  <input type="text" id="coorInput" placeholder="50.071853 14.400307" style="width: 180px;"><br>
+  <input type="text" id="coorInput" placeholder="50.071853 14.400307" required style="width: 180px;"><button onclick="prefillGPSandAzimuth()">Fill my location</button><br>
 
   <label for="azimuthInput" style="display: inline-block;  width: 180px;" >Azimuth</label>
-  <input type="number" min="0" max="360" id="azimuthInput" placeholder="Azimuth" value="15" style="width: 180px;"><br>
+  <input type="number" min="0" max="360" id="azimuthInput" required placeholder="Azimuth" style="width: 180px;"><br>
 
-  <label for="distanceInput" style="display: inline-block;  width: 180px;" >Distance to draw</label>
-  <input type="number" min="1" max="100" id="distanceInput" value="30" style="width: 180px;"><br>
+  <label for="distanceInput" style="display: inline-block;  width: 180px;" >Distance to draw (km)</label>
+  <input type="number" min="1" max="100" id="distanceInput" required value="30" style="width: 180px;"><span id="azimuthAccuracy"></span><br>
 
   <label for="noteInput" style="display: inline-block;  width: 180px;" >Note</label>
   <input type="text" id="noteInput" placeholder="Your note goes here" style="width: 180px;"><br>
      <div style="padding-left:180px">
-      <button onclick="savePoint()">Save point</button>
-      <button onclick="prefillGPSandAzimuth()">Fill my location!</button>
+      <input type="submit" value="Save point" style="width: 90px; height: 30px;font-weight: bold;">
+      
+    </form>
 </div>
       <ol id="coorList"></ol>
    
@@ -54,13 +57,13 @@
 <div><button id="jsonButton">Show/hide export</button>
   <div id="jsonContainer" style="display: none;">
     <p>Copy and save the JSON below to save your points. You can import it later using the button below</p>
-    <textarea id="jsonTextArea" cols="40" rows="10" placeholder="Vložte JSON zde"></textarea>
+    <textarea id="jsonTextArea" cols="40" rows="10" placeholder="JSON goes here"></textarea>
     <br>
     <button id="setJsonButton">Import Points</button>
   </div>
 </div>
 
-  <script src="script.js?ver=330"></script>
+  <script src="script.js?ver=202307211907"></script>
   <script type="text/javascript">
    var center = SMap.Coords.fromWGS84(14.400307, 50.071853);
 var m = new SMap(JAK.gel("map"), center, 9);
@@ -120,6 +123,12 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Import fail:', error);
     }
   });
+});
+
+
+document.querySelector('form').addEventListener('submit', function(event) {
+  event.preventDefault();
+  savePoint();
 });
 </script>
 

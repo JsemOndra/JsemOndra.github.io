@@ -101,7 +101,7 @@ function savePoint(){
       refreshCoorList();
 
   } else {
-    alert('Invalid GPS coordinates. Please enter valid coordinates for Coordinates (e.g.  50°12\'12"N 14°32\'55"E)  or 50.1109221 8.6821267 and Azimuth (e.g. 15).'+coordinates);
+    alert('Invalid GPS coordinates. Please enter valid coordinates for Coordinates (e.g. 50°12\'12"N 14°32\'55"E or 50.1109221 8.6821267) and Azimuth (e.g. 15).');
   }
 }
 // Function to check if GPS coordinates are valid
@@ -188,10 +188,8 @@ function deletePoint(uuid) {
     if (confirmation) {
           gpsCoordinates.splice(indexToDelete, 1);
           refreshCoorList();
-      console.log("Point deleted successfully.");
     } else {
-    
-      console.log("Point deletion canceled.");
+          console.log("Point deletion canceled.");
     }
   } else {
     
@@ -228,7 +226,6 @@ function redrawAllLines() {
                mergedPoints = mergedPoints.concat(drawLineWithAzimuth(item.latitude,item.longitude,item.azimuth,item.distance, item.uuid));
             }
           })
-  console.log(mergedPoints);
   if(mergedPoints.length===0){
       m.setCenterZoom(SMap.Coords.fromWGS84(14.400307, 50.071853), 9, true);
   } else {
@@ -278,14 +275,14 @@ function getGPSLocation() {
       function(position) {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
-        document.getElementById("coorInput").value = " " + latitude + " " + longitude;
+        document.getElementById("coorInput").value = latitude + " " + longitude;
       },
       function(error) {
-        console.error("Chyba při získávání GPS souřadnic:", error);
+        console.error("cannot get GPS coordinates:", error);
       }
     );
   } else {
-    console.error("Geolokace není podporována v tomto prohlížeči.");
+    console.error("Geolocation is not supported in this browser.");
   }
 }
 // Function to prefill GPS and azimuth values
@@ -298,13 +295,24 @@ function prefillGPSandAzimuth() {
 }
 // Function to get device orientation / azimuth
 function getDeviceOrientation() {
-  if ("ondeviceorientationabsolute" in window) {
-    window.addEventListener("deviceorientationabsolute", function(event) {
-      const alpha = event.alpha;
-       document.getElementById("azimuthInput").value = alpha;
-      console.log("Azimut:", alpha);
-    });
+  if ("deviceorientationabsolute" in window) {
+    window.addEventListener("deviceorientationabsolute", deviceAzimuthChange);
   } else {
-    console.error("Získání azimutu není podporováno v tomto prohlížeči.");
+    console.error("Azimuth acquisition is not supported in this browser.");
   }
+}
+
+function deviceAzimuthChange(event){
+   if (event.absolute) {
+      const alpha = Math.round(event.alpha,0);
+      document.getElementById("azimuthInput").value = alpha;
+      document.getElementById("azimuthAccuracy").innerHTML = "Accuracy:" + event.webkitCompassAccuracy;
+       if ('webkitCompassAccuracy' in DeviceOrientationEvent.prototype) {
+          if(Math.abs(event.webkitCompassAccuracy) < 10 ){
+                  window.removeEventListener("deviceorientationabsolute", deviceAzimuthChange);
+          }
+       }else{
+            window.removeEventListener("deviceorientationabsolute", deviceAzimuthChange);
+      }
+    }
 }
