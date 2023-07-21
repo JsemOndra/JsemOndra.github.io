@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+     <meta charset="utf-8" />
+    <script type="text/javascript" src="https://api.mapy.cz/loader.js"></script>
+    <script type="text/javascript">Loader.load();</script>
+    <title>Mapítko</title>
+
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <div class="map-container">
+    <div id="map" class="map"></div>
+  </div>
+  <div class="controls-container">
+    <div>
+      <select id="layerSelect" onchange="layerChange()">
+        <option value="0">Base</option>
+        <option value="1">OrtoPhoto</option>
+        <option value="2">Relief</option>
+         <!--<option value="3">Hybrid</option>-->
+        <option value="4">Turist</option>
+        <option value="5" selected>Geography</option>
+      </select>
+    </div>
+    <div>  
+          <label for="coorInput" style="display: inline-block; width: 180px;">Input Coordinates</label>
+  <input type="text" id="coorInput" placeholder="Coordinates" style="width: 180px;"><br>
+
+  <label for="azimuthInput" style="display: inline-block; width: 180px;">Azimuth</label>
+  <input type="number" min="0" max="360" id="azimuthInput" placeholder="Azimuth" value="15" style="width: 180px;"><br>
+
+  <label for="distanceInput" style="display: inline-block; width: 180px;">Distance to draw</label>
+  <input type="number" min="1" max="100" id="distanceInput" value="30" style="width: 180px;"><br>
+
+  <label for="noteInput" style="display: inline-block; width: 180px;">Note</label>
+  <input type="text" id="noteInput" placeholder="Your note goes here" style="width: 180px;"><br>
+      <button onclick="savePoint()">Save point</button>
+      <button onclick="prefillGPSandAzimuth()">Fill my location!</button>
+
+      <ol id="coorList"></ol>
+    </div>
+  </div>
+
+  <script src="script.js?ver=326"></script>
+  <script type="text/javascript"> var center = SMap.Coords.fromWGS84(14.53138888, 50.2011111);
+var m = new SMap(JAK.gel("map"), center, 13);
+var layers = {};
+layers[SMap.DEF_BASE] = m.addDefaultLayer(SMap.DEF_BASE);
+layers[SMap.DEF_OPHOTO] = m.addDefaultLayer(SMap.DEF_OPHOTO);
+layers[SMap.DEF_RELIEF] = m.addDefaultLayer(SMap.DEF_RELIEF);
+layers[SMap.DEF_HYBRID] = m.addDefaultLayer(SMap.DEF_HYBRID);
+layers[SMap.DEF_TURIST] = m.addDefaultLayer(SMap.DEF_TURIST);
+layers[SMap.DEF_GEOGRAPHY] = m.addDefaultLayer(SMap.DEF_GEOGRAPHY);
+layers[SMap.DEF_GEOGRAPHY].enable(); /* pro začátek zapnout základní podklad */
+m.addDefaultControls();
+var layer = new SMap.Layer.Geometry();
+m.addLayer(layer);
+layer.enable();
+loadGPSPoints();
+refreshCoorList();
+gpsCoordinates.forEach(item => {
+if(item.visible){drawLineWithAzimith(item.latitude,item.longitude,item.azimuth,item.distance, item.uuid)}});
+</script>
+
+</body>
+</html>
