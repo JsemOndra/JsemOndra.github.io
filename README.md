@@ -6,11 +6,22 @@ Mapitko is a simple web app that helps you locate distant objects on a map using
 
 ## How to Use
 
-1. Go to [Mapitko App](https://jsemondra.github.io/mapitko/mapitko.html).
+- Go to [Mapitko App](https://jsemondra.github.io/mapitko/mapitko.html).
 ![Or scan this QR](https://github.com/JsemOndra/mapitko/assets/6908554/45820c05-435b-4de0-9f18-ee00d20c2efc)
+- Fill Your Position and Azimuth Towards the Object in Respective Fields.
 
-3. Click on the "Add Position" button to enter the latitude, longitude, and azimuth angle for each position from where you want to locate the object.
-4. The app will calculate and display the location of the object on the map based on the entered positions and azimuth angles.
+- Allowed Formats for "Your Position":
+  - 50°21'12"N 10°12'55"E or 50.1109221 8.6821267 - These formats are good enough for my needs. Feel free to contribute with code to handle more formats.
+
+- Enter the Distance to Which the Line Should Be Drawn (Default is 30km) and an Optional Note.
+
+- Click on the "Save Point" Button to Save the Location From Where You Want to Locate the Object.
+
+- The App Will Calculate and Display the Vector/Line on the Map Based on the Entered Position and Azimuth Angles.
+- Enter additional lines from distant places, all pointing to the same object, to obtain a more accurate result.
+- _You Can Use Your Device's Location Services to fill GPS Coordinates to appropriate field._
+  
+
 
 ## Features
 
