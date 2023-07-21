@@ -4,7 +4,7 @@ body {
 }
 
 .map-container {
-  height: 85vh;
+  height: 80vh;
   /*background-color: red;*/
   display: flex;
   flex-direction: column;
@@ -35,4 +35,12 @@ body {
 
 .controls-container button {
   margin-top: 5px;
+}
+
+
+
+
+
+.collapsed {
+  display: none;
 }

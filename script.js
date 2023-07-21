@@ -70,6 +70,7 @@ var options1 = {
 };
 var polyline = new SMap.Geometry(SMap.GEOMETRY_POLYLINE, null, points1, options1);
 layer.addGeometry(polyline);
+return points1;
   
 }
 function savePoint(){
@@ -94,15 +95,18 @@ function savePoint(){
 function isValidGPSCoordinate(coordinate) {
   const coordinateRegex = /^\d{1,3}°\d{1,2}'\d{1,2}" ?[NS] \d{1,3}°\d{1,2}'\d{1,2}" ?[EW]$/;
   const decimalCoordinateRegex = /^-?\d+(\.\d+)?\s+-?\d+(\.\d+)?$/;
-  return coordinateRegex.test(coordinate) | decimalCoordinateRegex.test(coordinate);
+  return coordinateRegex.test(coordinate) || decimalCoordinateRegex.test(coordinate);
 }
 
 function isValidAzimuth(azimuth) {
+  // Regulární výraz pro kontrolu platného azimuthu
   const azimuthRegex = /^(?:[0-9]|[1-9][0-9]|[1-2][0-9]{2}|3[0-5][0-9]|360)$/;
   return azimuthRegex.test(azimuth);
 }
 
 function convertToScriptCoordinate(coordinate) {
+  var decimalLatitude = 0;
+  var decimalLongitude = 0;
   coordinate = coordinate.replace(/\s+([SJVZNEW])/g, '$1');
   const decimalCoordinateRegex = /^-?\d+(\.\d+)?\s+-?\d+(\.\d+)?$/;
   if(decimalCoordinateRegex.test(coordinate)){
@@ -114,8 +118,8 @@ function convertToScriptCoordinate(coordinate) {
       const [degrees, minutes, seconds] = part.split(/[°'"]/).map(parseFloat);
       return degrees + minutes / 60 + seconds / 3600;
     }
-    const decimalLatitude = convertCoordinatePart(latitude);
-    const decimalLongitude = convertCoordinatePart(longitude);
+    decimalLatitude = convertCoordinatePart(latitude);
+    decimalLongitude = convertCoordinatePart(longitude);
     const isSouth = latitude.includes("S");
     const isWest = longitude.includes("W");
     if (isSouth) {
@@ -146,7 +150,7 @@ function refreshCoorList(){
     }
     newListItem.prepend(checkbox);
     checkbox.addEventListener('change', () => plot(item.uuid));
-
+    newListItem.append(" | Action: ");
     const dlt = document.createElement('a');
     dlt.href="#";
     dlt.innerHTML="Delete";
@@ -158,9 +162,10 @@ function refreshCoorList(){
 
 function deletePoint(uuid) {
     const indexToDelete = gpsCoordinates.findIndex(item => item.uuid === uuid);
+    const item = gpsCoordinates.find(item => item.uuid === uuid);
 
   if (indexToDelete !== -1) {
-    const confirmation = confirm("Are you sure you want to delete this point?");
+    const confirmation = confirm("Are you sure you want to delete this point? \n"+ formatListItem(item));
 
     if (confirmation) {
           gpsCoordinates.splice(indexToDelete, 1);
@@ -180,28 +185,33 @@ function deletePoint(uuid) {
 }
 function plot(uuid){
    
-    const foundItem = gpsCoordinates.find(item => item.uuid === uuid);
+
+   const foundItem = gpsCoordinates.find(item => item.uuid === uuid);
       if (foundItem) {
-        foundItem.visible = event.target.checked;
-        if(foundItem.visible){
-          drawLineWithAzimith(foundItem.latitude,foundItem.longitude,foundItem.azimuth,foundItem.distance, uuid)
-        }else{
-          //redraw all, it's faster than finding geometry
+          foundItem.visible = event.target.checked;
           redrawAllLines();
-        }
-        saveGPSPoints();
+          saveGPSPoints();
        } else {
           console.log("Item with this GUID was not found.");
       } 
 
 }
 function redrawAllLines() {
+  mergedPoints = [];
           layer.removeAll();
           gpsCoordinates.forEach(item => {
             if(item.visible){
-               drawLineWithAzimith(item.latitude,item.longitude,item.azimuth,item.distance, item.uuid)
+               mergedPoints = mergedPoints.concat(drawLineWithAzimith(item.latitude,item.longitude,item.azimuth,item.distance, item.uuid));
             }
           })
+  console.log(mergedPoints);
+  if(mergedPoints.length===0){
+      m.setCenterZoom(SMap.Coords.fromWGS84(14.400307, 50.071853), 9, true);
+  } else {
+    var  centerZoomCalc = m.computeCenterZoom(mergedPoints,true)
+    m.setCenterZoom(centerZoomCalc[0], centerZoomCalc[1], true);
+  }
+   
 }
 
 function formatListItem(obj) {
