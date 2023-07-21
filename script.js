@@ -98,8 +98,7 @@ function isValidGPSCoordinate(coordinate) {
 }
 
 function isValidAzimuth(azimuth) {
-  // Regulární výraz pro kontrolu platného azimuthu
-  const azimuthRegex = /^[-+]?([0-9]\d?|1[0-7]\d|180)(\.\d+)?$/;
+  const azimuthRegex = /^(?:[0-9]|[1-9][0-9]|[1-2][0-9]{2}|3[0-5][0-9]|360)$/;
   return azimuthRegex.test(azimuth);
 }
 
