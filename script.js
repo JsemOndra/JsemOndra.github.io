@@ -1,4 +1,5 @@
- window.gpsCoordinates = [];
+// Array to store GPS coordinates
+window.gpsCoordinates = [];
 
 
 function toRadians(degrees) {
@@ -10,11 +11,13 @@ function toDegrees(radians) {
   return radians * 180 / Math.PI;
 }
 
-
+// Function to handle layer change
 function layerChange() {
-  const selectedLayer = document.getElementById('layerSelect').value;
-   for (var p in layers) { layers[p].disable(); }
+  const selectedLayer = document.getElementById('layerSelect').value;  
 
+  // Disable all existing layers
+   for (var p in layers) { layers[p].disable(); }
+  // Enable the selected layer based on the value
     switch (selectedLayer) {
         case "0": 
             layers[SMap.DEF_BASE].enable();
@@ -34,6 +37,7 @@ function layerChange() {
         break;
     }
 }
+// Function to calculate the destination point using magic formula, takes GPS coordinates, azimuth and distance in kilometers
 
 function calculateDestinationPoint(latitude, longitude, azimuthDegrees, distanceKm) {
   const R = 6371.009; // Earth's radius in km
@@ -57,8 +61,8 @@ function calculateDestinationPoint(latitude, longitude, azimuthDegrees, distance
 
   return { latitude: newLatitude, longitude: newLongitude };
 }
-
-function drawLineWithAzimith(latitude, longitude, azimuth, distance, uuid) {
+// Function to draw a line with azimuth on the map
+function drawLineWithAzimuth(latitude, longitude, azimuth, distance, uuid) {
   destination = calculateDestinationPoint(latitude, longitude, azimuth, distance);
   var points1 = [
       SMap.Coords.fromWGS84(longitude, latitude),
@@ -73,15 +77,24 @@ layer.addGeometry(polyline);
 return points1;
   
 }
+
+// Function to save a point with GPS coordinates
+
 function savePoint(){
+    // Get input elements
+
   const coorInput = document.getElementById('coorInput');
   const azimuthInput = document.getElementById('azimuthInput');
   const distanceInput = document.getElementById('distanceInput');
   const noteInput = document.getElementById('noteInput');
+    // Get values from input elements and trim white spaces
+
   const coordinates = coorInput.value.trim().replace(/ +/g, ' ').replace(/′/g, "'").replace(/″/g, '"');
   const azimuth = azimuthInput.value.trim();
   const distance = distanceInput.value.trim();
   const note = noteInput.value.trim();
+    // Check if the entered coordinates and azimuth are valid
+
   if (isValidGPSCoordinate(coordinates) && isValidAzimuth(azimuth)) {
     result= convertToScriptCoordinate(coordinates);
       gpsCoordinates.push({ latitude: result[0], longitude: result[1], azimuth:azimuth, distance:distance, note: note, uuid: uuidv4(), visible: false});
@@ -91,18 +104,21 @@ function savePoint(){
     alert('Invalid GPS coordinates. Please enter valid coordinates for Coordinates (e.g.  50°12\'12"N 14°32\'55"E)  or 50.1109221 8.6821267 and Azimuth (e.g. 15).'+coordinates);
   }
 }
+// Function to check if GPS coordinates are valid
 
 function isValidGPSCoordinate(coordinate) {
   const coordinateRegex = /^\d{1,3}°\d{1,2}'\d{1,2}" ?[NS] \d{1,3}°\d{1,2}'\d{1,2}" ?[EW]$/;
   const decimalCoordinateRegex = /^-?\d+(\.\d+)?\s+-?\d+(\.\d+)?$/;
   return coordinateRegex.test(coordinate) || decimalCoordinateRegex.test(coordinate);
 }
+// Function to check if azimuth is valid
 
 function isValidAzimuth(azimuth) {
- 
+  // Regulární výraz pro kontrolu platného azimuthu
   const azimuthRegex = /^(?:[0-9]|[1-9][0-9]|[1-2][0-9]{2}|3[0-5][0-9]|360)$/;
   return azimuthRegex.test(azimuth);
 }
+// Function to convert GPS coordinates to decimal format
 
 function convertToScriptCoordinate(coordinate) {
   var decimalLatitude = 0;
@@ -133,6 +149,7 @@ function convertToScriptCoordinate(coordinate) {
 }
 
 
+// Function to refresh the coordinates list on the page
 
 function refreshCoorList(){
   coorList = document.getElementById("coorList");
@@ -159,6 +176,7 @@ function refreshCoorList(){
     coorList.appendChild(newListItem);
   });
 }
+// Function to delete a point by its UUID
 
 function deletePoint(uuid) {
     const indexToDelete = gpsCoordinates.findIndex(item => item.uuid === uuid);
@@ -183,6 +201,9 @@ function deletePoint(uuid) {
   saveGPSPoints();
   return false;
 }
+
+// Function to handle the visibility of a point
+
 function plot(uuid){
    
 
@@ -196,12 +217,15 @@ function plot(uuid){
       } 
 
 }
+
+// Function to redraw all lines on the map
+
 function redrawAllLines() {
   mergedPoints = [];
           layer.removeAll();
           gpsCoordinates.forEach(item => {
             if(item.visible){
-               mergedPoints = mergedPoints.concat(drawLineWithAzimith(item.latitude,item.longitude,item.azimuth,item.distance, item.uuid));
+               mergedPoints = mergedPoints.concat(drawLineWithAzimuth(item.latitude,item.longitude,item.azimuth,item.distance, item.uuid));
             }
           })
   console.log(mergedPoints);
@@ -213,6 +237,7 @@ function redrawAllLines() {
   }
    
 }
+// Function to format a list item for display
 
 function formatListItem(obj) {
   const { latitude, longitude, azimuth, distance, note } = obj;
@@ -222,17 +247,20 @@ function formatListItem(obj) {
   return formattedCoordinates;
 }
 
+// Function to generate a UUID
 
 function uuidv4() {
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
     (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
   );
 }
+// Function to save GPS points to local storage
 
 function saveGPSPoints(){
   const gpsCoordinatesJson = JSON.stringify(gpsCoordinates);
   localStorage.setItem('gpsData', gpsCoordinatesJson);
 }
+// Function to load GPS points from local storage
 
 function loadGPSPoints(){
   const gpsCoordinatesJson = localStorage.getItem('gpsData');
@@ -242,6 +270,7 @@ function loadGPSPoints(){
 }
 
 
+// Function to get GPS location from the device
 
 function getGPSLocation() {
   if ("geolocation" in navigator) {
@@ -252,13 +281,14 @@ function getGPSLocation() {
         document.getElementById("coorInput").value = " " + latitude + " " + longitude;
       },
       function(error) {
-        console.error("Cannot get GPS coordinated:", error);
+        console.error("Chyba při získávání GPS souřadnic:", error);
       }
     );
   } else {
-    console.error("Geolocation is not supported.");
+    console.error("Geolokace není podporována v tomto prohlížeči.");
   }
 }
+// Function to prefill GPS and azimuth values
 
 
 
@@ -266,7 +296,7 @@ function prefillGPSandAzimuth() {
   getGPSLocation();
   getDeviceOrientation();
 }
-
+// Function to get device orientation / azimuth
 function getDeviceOrientation() {
   if ("ondeviceorientationabsolute" in window) {
     window.addEventListener("deviceorientationabsolute", function(event) {
@@ -275,6 +305,6 @@ function getDeviceOrientation() {
       console.log("Azimut:", alpha);
     });
   } else {
-    console.error("Azimuth not supported by this browser.");
+    console.error("Získání azimutu není podporováno v tomto prohlížeči.");
   }
 }
